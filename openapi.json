@@ -1,0 +1,207 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Task API",
+    "version": "1.0.0",
+    "description": "A small CRUD API for managing an in-memory list of tasks. Documents the endpoints implemented in controllers/task.controller.ts."
+  },
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Local dev server" }
+  ],
+  "tags": [
+    { "name": "Tasks", "description": "Operations on task resources" }
+  ],
+  "paths": {
+    "/tasks": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "List all tasks",
+        "operationId": "allTasks",
+        "responses": {
+          "200": {
+            "description": "Tasks fetched successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Tasks fetched successfully." },
+                    "tasks": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Task" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "Create a task",
+        "operationId": "createTask",
+        "description": "Creates a task. Only `title` is accepted; `done` defaults to false and `id` is assigned by the server.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTaskInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task added successfully. Returns the full task list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Task added successfully." },
+                    "task": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Task" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing title.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Please add the task." }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Numeric id of the task.",
+          "schema": { "type": "integer" }
+        }
+      ],
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "Get a single task by id",
+        "operationId": "singleTask",
+        "responses": {
+          "200": {
+            "description": "Task fetched successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Task fetched successfully." },
+                    "tasks": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Task" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Task not found.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Task not found." }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Tasks"],
+        "summary": "Update a task by id",
+        "operationId": "updateTask",
+        "description": "Partially updates a task. Any of `title` or `done` may be supplied.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateTaskInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated. Returns the full task list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "done" },
+                    "task": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Task" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task with the given id was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Failed" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "title": { "type": "string", "example": "Complete authentication API" },
+          "done": { "type": "boolean", "example": false }
+        },
+        "required": ["id", "title", "done"]
+      },
+      "CreateTaskInput": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "example": "Write integration tests" }
+        },
+        "required": ["title"]
+      },
+      "UpdateTaskInput": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "example": "Updated title" },
+          "done": { "type": "boolean", "example": true }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" }
+        }
+      }
+    }
+  }
+}
