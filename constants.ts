@@ -1,4 +1,4 @@
-import type { Task } from "./controllers/task.conntroller.js";
+import type { Task } from "./controllers/task.controller.js";
 
 export const tasks : Task[] = [
   { id: 1, title: "Complete authentication API", done: false },
