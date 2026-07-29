@@ -1,8 +1,8 @@
 import Database from "better-sqlite3";
 
-const db = new Database("tasks.db");
+export const db = new Database("tasks.db");
 
-function seed() {
+export function seed() {
   const createTableSql = `
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -10,17 +10,19 @@ function seed() {
       done INTEGER DEFAULT 0
     );
 
-    INSERT INTO tasks (title, done)
-    VALUES ('Buy Eggs', 0),('Buy Bread', 0),('DO Homework', 0)
-    ;
+    
   `;
-
   db.exec(createTableSql);
+
+  const { count } = db.prepare("SELECT COUNT(*) FROM tasks").get() as {
+    count: number;
+  };
+  if (count === 0) {
+    db.exec(`INSERT INTO tasks (title, done)
+    VALUES ('Buy Eggs', 0),('Buy Bread', 0),('DO Homework', 0)
+    ;`);
+  }
 
   const rows = db.prepare(`SELECT * FROM tasks`).all();
   console.log(rows);
-
-  
 }
-
-seed();

@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express"
 import swaggerDocument from "./openapi.json" with { type: "json" };
 
+
 import { taskRouter } from "./routes/task.route.js";
 
 const app = express();

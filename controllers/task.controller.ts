@@ -6,85 +6,96 @@ export interface Task {
   title: String;
   done: Boolean;
 }
+import { db } from "../seed.js";
 
 const taskList: Task[] = [...tasks];
 
 export const allTasks = (req: Request, res: Response) => {
+  const { count } = db.prepare(`SELECT COUNT (*) FROM tasks`).get() as {
+    count: number;
+  };
+  if (count === 0) {
+    res.status(200).json({
+      message: "No tasks",
+      tasks: null,
+    });
+  }
+  const rows = db.prepare(`SELECT * FROM tasks`).all();
   res.status(200).json({
     message: "Tasks fetched successfully.",
-    tasks: taskList,
+    tasks: rows,
   });
 };
 export const singleTask = (req: Request, res: Response) => {
   const idStr = req.params.id;
   const id = Number(idStr);
   console.log(id);
-  const task = taskList.filter((task) => {
-    return task.id === id;
-  });
-  if (task.length < 1) {
-    res.status(400).json({
-      error: "Task not found.",
-    });
-    return
-  }
+  const task = db
+    .prepare(
+      `SELECT * FROM tasks WHERE 
+    id = ?`,
+    )
+    .get(id) as any;
 
+  if(task === undefined){
+     res.status(404).json({
+      error: "Tasks not found",
+    });
+  }
   res.status(200).json({
     message: "Task fetched successfully.",
     tasks: task,
   });
 };
 
-export const createTask = (req:Request, res: Response)=>{
-    console.log(req.body
-    )
-    const task = req.body;
+export const createTask = (req: Request, res: Response) => {
+  console.log(req.body);
+  const task = req.body;
 
-    if(task.title == null){
-        res.status(400).json({
-            error: "Please add the task."
-        });
-        return;
-    }
+  if (task.title == null) {
+    res.status(400).json({
+      error: "Please add the task.",
+    });
+    return;
+  }
 
-    taskList.push({
-        id: taskList.length + 1,
-        title: task.title,
-        done: false 
-    })
-    res.status(201).json({
-        message: "Tak added successfully",
-        task: taskList
+  taskList.push({
+    id: taskList.length + 1,
+    title: task.title,
+    done: false,
+  });
+  res.status(201).json({
+    message: "Tak added successfully",
+    task: taskList,
+  });
+};
 
-    })
-}
-
-export const updateTask = (req: Request, res: Response)=>{
+export const updateTask = (req: Request, res: Response) => {
   const idStr = req.params.id;
   const id = Number(idStr);
   let found = false;
 
   const newTask = req.body;
-  taskList.map((task)=>{
-    if(task.id ===  id){
+  taskList.map((task) => {
+    if (task.id === id) {
       found = true;
-      if(newTask.title){
+      if (newTask.title) {
         task.title = newTask.title;
       }
-      if(newTask.done){
+      if (newTask.done) {
         task.done = newTask.done;
       }
     }
-  })
-  if(!found){
+  });
+  if (!found) {
     res.status(404).json({
-    message: "Failed",
-  })
-  return;
+      message: "Failed",
+    });
+    return;
   }
 
   res.status(200).json({
     message: "done",
-    task : taskList
-  })
-}
+    task: taskList,
+  });
+};
