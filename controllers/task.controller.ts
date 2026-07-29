@@ -70,29 +70,21 @@ export const createTask = (req: Request, res: Response) => {
 export const updateTask = (req: Request, res: Response) => {
   const idStr = req.params.id;
   const id = Number(idStr);
-  let found = false;
-
   const newTask = req.body;
-  taskList.map((task) => {
-    if (task.id === id) {
-      found = true;
-      if (newTask.title) {
-        task.title = newTask.title;
-      }
-      if (newTask.done) {
-        task.done = newTask.done;
-      }
-    }
-  });
+  
+  const found = db.prepare(`SELECT id from tasks WHERE id= ?`).get(id)
   if (!found) {
     res.status(404).json({
       message: "Failed",
     });
     return;
   }
+  const updaedTask = db.prepare(`UPDATE tasks
+    SET DONE = ?
+    WHERE id = ?`).run(newTask.done, id)
 
   res.status(200).json({
     message: "done",
-    task: taskList,
+    task: updaedTask,
   });
 };
