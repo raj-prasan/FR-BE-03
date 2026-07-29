@@ -11,9 +11,9 @@ import { db } from "../seed.js";
 const taskList: Task[] = [...tasks];
 
 export const allTasks = (req: Request, res: Response) => {
-  const { count } = db.prepare(`SELECT COUNT (*) FROM tasks`).get() as {
-    count: number;
-  };
+  const { count } = db
+  .prepare("SELECT COUNT(*) AS count FROM tasks")
+  .get() as { count: number };
   if (count === 0) {
     res.status(200).json({
       message: "No tasks",
@@ -58,15 +58,12 @@ export const createTask = (req: Request, res: Response) => {
     });
     return;
   }
+  const addTask = db.prepare(`INSERT INTO tasks(title)
+    VALUES(?)`).run(task.title)
 
-  taskList.push({
-    id: taskList.length + 1,
-    title: task.title,
-    done: false,
-  });
   res.status(201).json({
     message: "Tak added successfully",
-    task: taskList,
+    task: addTask,
   });
 };
 

@@ -14,9 +14,9 @@ export function seed() {
   `;
   db.exec(createTableSql);
 
-  const { count } = db.prepare("SELECT COUNT(*) FROM tasks").get() as {
-    count: number;
-  };
+  const { count } = db
+  .prepare("SELECT COUNT(*) AS count FROM tasks")
+  .get() as { count: number };
   if (count === 0) {
     db.exec(`INSERT INTO tasks (title, done)
     VALUES ('Buy Eggs', 0),('Buy Bread', 0),('DO Homework', 0)
