@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch index.js",
-    "start": "tsc index.ts"
+    "start": "tsx index.ts"
   },
   "keywords": [],
   "author": "",
