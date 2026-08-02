@@ -1,28 +1,36 @@
-import Database from "better-sqlite3";
+import {Client, Pool} from "pg"
 
-export const db = new Database("tasks.db");
+export const db = new Pool({
+  connectionString: "postgres://postgres:dev@localhost:5432/tasks"
+});
 
-export function seed() {
+
+
+export async  function  seed() {
   const createTableSql = `
     CREATE TABLE IF NOT EXISTS tasks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY ,
       title TEXT,
-      done INTEGER DEFAULT 0
+      done BOOLEAN DEFAULT FALSE
     );
 
     
   `;
-  db.exec(createTableSql);
+  await db.query(createTableSql);
+  console.log("Table created successfully.")
 
-  const { count } = db
-  .prepare("SELECT COUNT(*) AS count FROM tasks")
-  .get() as { count: number };
+  const result  = await db
+  .query("SELECT COUNT(*) AS count FROM tasks") 
+  const count = Number(result.rows[0].count);
+
   if (count === 0) {
-    db.exec(`INSERT INTO tasks (title, done)
-    VALUES ('Buy Eggs', 0),('Buy Bread', 0),('DO Homework', 0)
+    await db.query(`INSERT INTO tasks (title, done)
+    VALUES ('Buy Eggs', FALSE),('Buy Bread', FALSE),('DO Homework', FALSE)
     ;`);
   }
+  console.log("DB seeded successfully.")
 
-  const rows = db.prepare(`SELECT * FROM tasks`).all();
+  const rows = await db.query(`SELECT * FROM tasks`);
   console.log(rows);
 }
+
