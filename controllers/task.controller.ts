@@ -8,34 +8,33 @@ export interface Task {
 }
 import { db } from "../seed.js";
 
-const taskList: Task[] = [...tasks];
 
-export const allTasks = (req: Request, res: Response) => {
-  const { count } = db
-  .prepare("SELECT COUNT(*) AS count FROM tasks")
-  .get() as { count: number };
+
+export const allTasks = async (req: Request, res: Response) => {
+  const {rows : [{count}]} = await db
+  .query("SELECT COUNT(*) AS count FROM tasks")
   if (count === 0) {
     res.status(200).json({
       message: "No tasks",
       tasks: null,
     });
   }
-  const rows = db.prepare(`SELECT * FROM tasks`).all();
+  const {rows} = await db.query(`SELECT * FROM tasks`);
   res.status(200).json({
     message: "Tasks fetched successfully.",
     tasks: rows,
   });
 };
-export const singleTask = (req: Request, res: Response) => {
+export const singleTask = async (req: Request, res: Response) => {
   const idStr = req.params.id;
   const id = Number(idStr);
   console.log(id);
-  const task = db
-    .prepare(
+  const {rows : [task]} = await db
+    .query(
       `SELECT * FROM tasks WHERE 
-    id = ?`,
+    id = $1`,[id]
     )
-    .get(id) as any;
+    
 
   if(task === undefined){
      res.status(404).json({
@@ -48,7 +47,7 @@ export const singleTask = (req: Request, res: Response) => {
   });
 };
 
-export const createTask = (req: Request, res: Response) => {
+export const createTask = async(req: Request, res: Response) => {
   console.log(req.body);
   const task = req.body;
 
@@ -58,8 +57,8 @@ export const createTask = (req: Request, res: Response) => {
     });
     return;
   }
-  const addTask = db.prepare(`INSERT INTO tasks(title)
-    VALUES(?)`).run(task.title)
+  const addTask = await db.query(`INSERT INTO tasks(title)
+    VALUES($1)`,[task.title])
 
   res.status(201).json({
     message: "Tak added successfully",
@@ -67,21 +66,21 @@ export const createTask = (req: Request, res: Response) => {
   });
 };
 
-export const updateTask = (req: Request, res: Response) => {
+export const updateTask = async(req: Request, res: Response) => {
   const idStr = req.params.id;
   const id = Number(idStr);
   const newTask = req.body;
   
-  const found = db.prepare(`SELECT id from tasks WHERE id= ?`).get(id)
+  const found = db.query(`SELECT id from tasks WHERE id= $1`,[id])
   if (!found) {
     res.status(404).json({
       message: "Failed",
     });
     return;
   }
-  const updaedTask = db.prepare(`UPDATE tasks
-    SET DONE = ?
-    WHERE id = ?`).run(newTask.done, id)
+  const {rows : [updaedTask]} = await db.query(`UPDATE tasks
+    SET DONE = $1
+    WHERE id = $2`, [newTask.done, id])
 
   res.status(200).json({
     message: "done",

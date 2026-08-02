@@ -27,10 +27,11 @@ export async  function  seed() {
     await db.query(`INSERT INTO tasks (title, done)
     VALUES ('Buy Eggs', FALSE),('Buy Bread', FALSE),('DO Homework', FALSE)
     ;`);
+    console.log("DB seeded successfully.")
   }
-  console.log("DB seeded successfully.")
+  
 
   const rows = await db.query(`SELECT * FROM tasks`);
-  console.log(rows);
+  console.log(rows.rows)
 }
 
