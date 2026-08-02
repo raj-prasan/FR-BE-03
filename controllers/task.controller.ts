@@ -57,12 +57,11 @@ export const createTask = async(req: Request, res: Response) => {
     });
     return;
   }
-  const addTask = await db.query(`INSERT INTO tasks(title)
+  await db.query(`INSERT INTO tasks(title)
     VALUES($1)`,[task.title])
 
   res.status(201).json({
     message: "Tak added successfully",
-    task: addTask,
   });
 };
 

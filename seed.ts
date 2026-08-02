@@ -1,7 +1,7 @@
 import {Client, Pool} from "pg"
 
 export const db = new Pool({
-  connectionString: "postgres://postgres:dev@localhost:5432/tasks"
+  connectionString: process.env.DATABASE_URL
 });
 
 
