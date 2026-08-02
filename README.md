@@ -8,14 +8,9 @@ The database file is stored at the project root as `tasks.db`.
 
 ## Start the project
 
-Install dependencies first:
+
 
 ```bash
-npm install
-```
+docker run --name taskdb -e POSTGRES_PASSWORD=dev -e POSTGRES_DB=tasks -p 5432:5432 -v taskdata:/var/lib/postgresql/data -d postgres
 
-Then start the app in development mode:
-
-```bash
-npx tsx watch index.ts
 ```
