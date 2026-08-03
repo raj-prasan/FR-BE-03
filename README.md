@@ -1,16 +1,42 @@
-# FR-BE-02
+# FR-BE-03
 
-## Database
+This is a small Express + PostgreSQL task API. It exposes CRUD endpoints for tasks, seeds a few starter rows on startup, and serves Swagger docs at `/docs`.
 
-This project uses SQLite because it keeps the backend lightweight, requires no separate database server, and is a good fit for a small CRUD API that only needs simple local persistence.
+## Run Everything
 
-The database file is stored at the project root as `tasks.db`.
-
-## Start the project
-
-
+Start the API and database with one command:
 
 ```bash
-docker run --name taskdb -e POSTGRES_PASSWORD=dev -e POSTGRES_DB=tasks -p 5432:5432 -v taskdata:/var/lib/postgresql/data -d postgres
-
+docker compose up
 ```
+
+## Environment
+
+Set the variables shown in [.env.example](.env.example).
+
+The app expects at least:
+
+- `PORT`
+- `DATABASE_URL`
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/` | Basic service info |
+| GET | `/health` | Health check |
+| GET | `/docs` | Swagger UI |
+| GET | `/tasks` | List all tasks |
+| POST | `/tasks` | Create a task |
+| GET | `/tasks/:id` | Get one task by id |
+| PUT | `/tasks/:id` | Update a task's `done` state |
+
+## Example Request
+
+```bash
+curl -i -X POST http://localhost:3000/tasks \
+	-H "Content-Type: application/json" \
+	-d '{"title":"Buy milk"}'
+```
+
+![ Screenshot](./public/screenshot.png)
